@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, primaryKey, integer } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, primaryKey, integer, json } from 'drizzle-orm/pg-core'
 import type { AdapterAccount } from '@auth/core/adapters'
 
 export const users = pgTable('user', {
@@ -52,3 +52,23 @@ export const verificationTokens = pgTable(
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
   })
 )
+
+export const conversations = pgTable('conversation', {
+  id: text('id').notNull().primaryKey(),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  title: text('title').notNull().default('New Chat'),
+  createdAt: timestamp('createdAt', { mode: 'date' }).notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt', { mode: 'date' }).notNull().defaultNow(),
+})
+
+export const messages = pgTable('message', {
+  id: text('id').notNull().primaryKey(),
+  conversationId: text('conversationId')
+    .notNull()
+    .references(() => conversations.id, { onDelete: 'cascade' }),
+  role: text('role').notNull(),
+  parts: json('parts').notNull(),
+  createdAt: timestamp('createdAt', { mode: 'date' }).notNull().defaultNow(),
+})
