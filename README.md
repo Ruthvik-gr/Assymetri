@@ -5,7 +5,7 @@ A chat-based AI assistant built with Next.js and TypeScript. Authenticated users
 ---
 
 ## Links
-- **Live Demo:** https://your-vercel-url.vercel.app
+- **Live Demo:** https://assymetri-ruddy.vercel.app
  
 ## Tech Stack
 
