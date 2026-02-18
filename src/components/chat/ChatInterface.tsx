@@ -10,7 +10,7 @@ import { TypingIndicator } from './TypingIndicator'
 import { UserAvatar } from '@/components/auth/UserAvatar'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Send, PanelLeftClose, PanelLeft, ArrowUp } from 'lucide-react'
+import { PanelLeftClose, PanelLeft, ArrowUp } from 'lucide-react'
 import {
   getOrCreateConversation,
   saveMessages,
@@ -24,12 +24,13 @@ export function ChatInterface() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const conversationIdRef = useRef<string | undefined>(undefined)
 
   const { messages, setMessages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({ api: '/api/chat' }),
-    onFinish: () => {
-      if (conversationId) {
-        saveMessages(conversationId, messages)
+    onFinish: ({ messages: finalMessages }) => {
+      if (conversationIdRef.current) {
+        saveMessages(conversationIdRef.current, finalMessages).catch(() => {})
       }
     },
   })
@@ -50,6 +51,7 @@ export function ChatInterface() {
       if (!conv) return
       convId = conv.id
       setConversationId(convId)
+      conversationIdRef.current = convId
     }
 
     setInput('')
@@ -70,12 +72,14 @@ export function ChatInterface() {
 
   const handleSelectConversation = useCallback(async (id: string) => {
     setConversationId(id)
+    conversationIdRef.current = id
     const msgs = await getConversationMessages(id)
     setMessages(msgs.map((m) => ({ ...m, parts: m.parts as UIMessage['parts'] })) as UIMessage[])
   }, [setMessages])
 
   const handleNewChat = useCallback(() => {
     setConversationId(undefined)
+    conversationIdRef.current = undefined
     setMessages([])
     setInput('')
   }, [setMessages])

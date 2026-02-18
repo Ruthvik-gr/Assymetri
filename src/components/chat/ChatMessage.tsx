@@ -21,6 +21,7 @@ function ToolResult({ toolName, result }: { toolName: string; result: unknown })
 export function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === 'user'
 
+  const seenToolNames = new Set<string>()
   const seenToolIds = new Set<string>()
   const dedupedParts = [...message.parts].reverse().filter((part) => {
     if (!isToolUIPart(part)) return true
@@ -28,6 +29,11 @@ export function ChatMessage({ message }: ChatMessageProps) {
     const id = toolPart.toolCallId ?? JSON.stringify(part)
     if (seenToolIds.has(id)) return false
     seenToolIds.add(id)
+    if (part.state === 'output-available') {
+      const name = getToolName(part)
+      if (seenToolNames.has(name)) return false
+      seenToolNames.add(name)
+    }
     return true
   }).reverse()
 
