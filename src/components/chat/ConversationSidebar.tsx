@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { getUserConversations, deleteConversation } from '@/lib/db/actions'
 import { cn } from '@/lib/utils'
 import { SquarePen, Trash2, MessageSquare, Sparkles } from 'lucide-react'
@@ -40,7 +39,7 @@ export function ConversationSidebar({ activeId, onSelect, onNew }: ConversationS
   }
 
   return (
-    <div className="flex flex-col h-full w-60 border-r shrink-0">
+    <div className="flex flex-col h-full w-60 border-r shrink-0 overflow-hidden">
       <div className="flex items-center justify-between px-4 h-14 border-b shrink-0">
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-primary" />
@@ -57,7 +56,7 @@ export function ConversationSidebar({ activeId, onSelect, onNew }: ConversationS
         </Button>
       </div>
 
-      <ScrollArea className="flex-1">
+      <div className="flex-1 overflow-y-auto">
         <div className="p-2 space-y-0.5">
           {isPending && conversations.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-8">Loading...</p>
@@ -75,7 +74,7 @@ export function ConversationSidebar({ activeId, onSelect, onNew }: ConversationS
                   activeId === c.id && 'bg-muted'
                 )}
               >
-                <div className="flex items-center gap-2.5 min-w-0">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
                   <MessageSquare className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                   <span className="text-sm truncate">{c.title}</span>
                 </div>
@@ -90,7 +89,7 @@ export function ConversationSidebar({ activeId, onSelect, onNew }: ConversationS
             ))
           )}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   )
 }
