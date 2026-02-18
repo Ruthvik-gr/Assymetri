@@ -1,13 +1,11 @@
 'use client'
 
 import { useEffect, useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
 import { getUserConversations, deleteConversation } from '@/lib/db/actions'
 import { cn } from '@/lib/utils'
-import { MessageSquare, Trash2, Plus } from 'lucide-react'
+import { MessageSquarePlus, Trash2, MessageSquare } from 'lucide-react'
 
 type Conversation = {
   id: string
@@ -24,7 +22,6 @@ interface ConversationSidebarProps {
 export function ConversationSidebar({ activeId, onSelect, onNew }: ConversationSidebarProps) {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [isPending, startTransition] = useTransition()
-  const router = useRouter()
 
   const load = () => {
     startTransition(async () => {
@@ -43,25 +40,27 @@ export function ConversationSidebar({ activeId, onSelect, onNew }: ConversationS
   }
 
   return (
-    <div className="flex flex-col h-full w-64 border-r bg-muted/30">
-      <div className="p-4">
-        <Button onClick={onNew} className="w-full" variant="outline" size="sm">
-          <Plus className="h-4 w-4 mr-2" />
+    <div className="flex flex-col h-full w-60 border-r bg-muted/20 shrink-0">
+      <div className="p-3 border-b">
+        <Button onClick={onNew} className="w-full justify-start gap-2" variant="ghost" size="sm">
+          <MessageSquarePlus className="h-4 w-4" />
           New Chat
         </Button>
       </div>
-      <Separator />
-      <ScrollArea className="flex-1 px-2 py-2">
-        {conversations.length === 0 ? (
-          <p className="text-xs text-muted-foreground text-center py-4">No conversations yet</p>
-        ) : (
-          <div className="space-y-1">
-            {conversations.map((c) => (
+
+      <ScrollArea className="flex-1">
+        <div className="p-2 space-y-0.5">
+          {conversations.length === 0 ? (
+            <p className="text-xs text-muted-foreground text-center py-8 px-4">
+              {isPending ? 'Loading...' : 'No conversations yet'}
+            </p>
+          ) : (
+            conversations.map((c) => (
               <div
                 key={c.id}
                 onClick={() => onSelect(c.id)}
                 className={cn(
-                  'flex items-center justify-between group rounded-md px-2 py-2 cursor-pointer hover:bg-muted transition-colors',
+                  'group flex items-center justify-between rounded-lg px-2 py-2 cursor-pointer hover:bg-muted transition-colors',
                   activeId === c.id && 'bg-muted'
                 )}
               >
@@ -72,15 +71,15 @@ export function ConversationSidebar({ activeId, onSelect, onNew }: ConversationS
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-6 w-6 opacity-0 group-hover:opacity-100 shrink-0"
+                  className="h-6 w-6 opacity-0 group-hover:opacity-100 shrink-0 hover:text-destructive"
                   onClick={(e) => handleDelete(e, c.id)}
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
+                  <Trash2 className="h-3 w-3" />
                 </Button>
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
       </ScrollArea>
     </div>
   )

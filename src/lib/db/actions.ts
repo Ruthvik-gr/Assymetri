@@ -1,15 +1,17 @@
 'use server'
 
+import { auth } from '@/lib/auth/config'
+
 import { db } from '@/lib/db'
 import { conversations, messages } from '@/lib/db/schema'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth/config'
+
+
 import { eq, desc } from 'drizzle-orm'
 import { UIMessage } from 'ai'
 import { nanoid } from 'nanoid'
 
 export async function getOrCreateConversation(conversationId?: string) {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
   if (!session?.user?.id) return null
 
   if (conversationId) {
@@ -32,7 +34,7 @@ export async function getOrCreateConversation(conversationId?: string) {
 }
 
 export async function saveMessages(conversationId: string, msgs: UIMessage[]) {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
   if (!session?.user?.id) return
 
   await db.delete(messages).where(eq(messages.conversationId, conversationId))
@@ -58,7 +60,7 @@ export async function updateConversationTitle(conversationId: string, firstUserM
 }
 
 export async function getUserConversations() {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
   if (!session?.user?.id) return []
 
   return db
@@ -70,7 +72,7 @@ export async function getUserConversations() {
 }
 
 export async function getConversationMessages(conversationId: string) {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
   if (!session?.user?.id) return []
 
   const conv = await db
@@ -89,7 +91,7 @@ export async function getConversationMessages(conversationId: string) {
 }
 
 export async function deleteConversation(conversationId: string) {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
   if (!session?.user?.id) return
 
   await db
