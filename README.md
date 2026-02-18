@@ -4,6 +4,9 @@ A chat-based AI assistant built with Next.js and TypeScript. Authenticated users
 
 ---
 
+## Links
+- **Live Demo:** https://your-vercel-url.vercel.app
+ 
 ## Tech Stack
 
 | Layer | Technology |
@@ -93,7 +96,7 @@ src/
 ### 1. Clone and install dependencies
 
 ```bash
-git clone https://github.com/your-username/your-repo.git
+git clone https://github.com/Ruthvik-gr/Assymetri
 cd ai-assistant
 npm install
 ```
