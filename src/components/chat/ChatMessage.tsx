@@ -21,6 +21,16 @@ function ToolResult({ toolName, result }: { toolName: string; result: unknown })
 export function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === 'user'
 
+  const seenToolIds = new Set<string>()
+  const dedupedParts = [...message.parts].reverse().filter((part) => {
+    if (!isToolUIPart(part)) return true
+    const toolPart = part as { toolCallId?: string }
+    const id = toolPart.toolCallId ?? JSON.stringify(part)
+    if (seenToolIds.has(id)) return false
+    seenToolIds.add(id)
+    return true
+  }).reverse()
+
   return (
     <div className={cn('flex gap-3 py-3', isUser ? 'flex-row-reverse' : 'flex-row')}>
       <div className={cn(
@@ -31,7 +41,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
       </div>
 
       <div className={cn('flex flex-col gap-2 max-w-[80%]', isUser ? 'items-end' : 'items-start')}>
-        {message.parts.map((part, i) => {
+        {dedupedParts.map((part, i) => {
           if (part.type === 'text' && part.text) {
             return (
               <div
